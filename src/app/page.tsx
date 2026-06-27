@@ -1,13 +1,30 @@
+"use client";
+
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import PaintingCard from "@/components/PaintingCard";
-import { paintings } from "@/data/paintings";
+import PaintingCard, { Painting } from "@/components/PaintingCard";
+import { fetchPaintings, fallbackPaintings } from "@/data/paintings";
 
 export default function Home() {
-  // Select first 3 paintings as featured works
-  const featuredPaintings = paintings.slice(0, 3);
+  const [featuredPaintings, setFeaturedPaintings] = useState<Painting[]>(fallbackPaintings.slice(0, 3));
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadPaintings() {
+      try {
+        const paintings = await fetchPaintings();
+        setFeaturedPaintings(paintings.slice(0, 3));
+      } catch (error) {
+        console.error('Failed to load paintings:', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadPaintings();
+  }, []);
 
   return (
     <>

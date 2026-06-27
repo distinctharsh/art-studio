@@ -1,6 +1,7 @@
 import { Painting } from "@/components/PaintingCard";
 
-export const paintings: Painting[] = [
+// Fallback static data for development or when API is unavailable
+export const fallbackPaintings: Painting[] = [
   {
     id: "quiet-moments",
     title: "Quiet Moments",
@@ -53,6 +54,27 @@ export const paintings: Painting[] = [
   },
 ];
 
-export const getPaintingById = (id: string): Painting | undefined => {
+// Fetch paintings from the PHP API
+export async function fetchPaintings(): Promise<Painting[]> {
+  try {
+    const response = await fetch('/api/paintings.php');
+    if (!response.ok) {
+      console.warn('API fetch failed, using fallback data');
+      return fallbackPaintings;
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.warn('API error, using fallback data:', error);
+    return fallbackPaintings;
+  }
+}
+
+// Get a single painting by ID
+export async function getPaintingById(id: string): Promise<Painting | undefined> {
+  const paintings = await fetchPaintings();
   return paintings.find((p) => p.id === id);
-};
+}
+
+// Legacy export for backward compatibility
+export const paintings = fallbackPaintings;

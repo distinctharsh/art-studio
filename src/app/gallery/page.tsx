@@ -7,7 +7,7 @@ import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import PaintingCard, { Painting } from "@/components/PaintingCard";
-import { paintings } from "@/data/paintings";
+import { fetchPaintings, fallbackPaintings } from "@/data/paintings";
 
 function GalleryContent() {
   const router = useRouter();
@@ -16,6 +16,23 @@ function GalleryContent() {
   const [selectedPainting, setSelectedPainting] = useState<Painting | null>(null);
   const [inquirySubmitted, setInquirySubmitted] = useState(false);
   const [formData, setFormData] = useState({ name: "", email: "", message: "" });
+  const [paintings, setPaintings] = useState<Painting[]>(fallbackPaintings);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch paintings on mount
+  useEffect(() => {
+    async function loadPaintings() {
+      try {
+        const data = await fetchPaintings();
+        setPaintings(data);
+      } catch (error) {
+        console.error('Failed to load paintings:', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadPaintings();
+  }, []);
 
   // Handle URL parameter for displaying details of a specific painting (?id=...)
   useEffect(() => {
@@ -28,7 +45,7 @@ function GalleryContent() {
     } else {
       setSelectedPainting(null);
     }
-  }, [searchParams]);
+  }, [searchParams, paintings]);
 
   const closeLightbox = () => {
     setSelectedPainting(null);
@@ -44,12 +61,36 @@ function GalleryContent() {
     router.push(`/gallery?id=${painting.id}`, { scroll: false });
   };
 
-  const handleFormSubmit = (e: React.FormEvent) => {
+  const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setInquirySubmitted(true);
-    setTimeout(() => {
-      closeLightbox();
-    }, 2500);
+    
+    try {
+      const response = await fetch('/api/inquiries.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          subject: 'Artwork Inquiry',
+          artwork: selectedPainting?.title || 'None',
+          message: formData.message,
+        }),
+      });
+
+      if (response.ok) {
+        setInquirySubmitted(true);
+        setTimeout(() => {
+          closeLightbox();
+        }, 2500);
+      } else {
+        alert('Failed to submit inquiry. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error submitting inquiry:', error);
+      alert('Failed to submit inquiry. Please try again.');
+    }
   };
 
   const filteredPaintings = paintings.filter((p) => {

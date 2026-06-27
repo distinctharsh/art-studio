@@ -4,6 +4,8 @@ import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { fetchPaintings, fallbackPaintings } from "@/data/paintings";
+import { Painting } from "@/components/PaintingCard";
 
 function ContactContent() {
   const searchParams = useSearchParams();
@@ -15,6 +17,20 @@ function ContactContent() {
     message: "",
   });
   const [submitted, setSubmitted] = useState(false);
+  const [paintings, setPaintings] = useState<Painting[]>(fallbackPaintings);
+
+  // Fetch paintings for dropdown
+  useEffect(() => {
+    async function loadPaintings() {
+      try {
+        const data = await fetchPaintings();
+        setPaintings(data);
+      } catch (error) {
+        console.error('Failed to load paintings:', error);
+      }
+    }
+    loadPaintings();
+  }, []);
 
   // Pre-fill artwork selection if passed via query params (e.g. ?painting=quiet-moments)
   useEffect(() => {
@@ -33,20 +49,38 @@ function ContactContent() {
     }
   }, [searchParams]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitted(true);
-    // Reset form after a brief delay
-    setTimeout(() => {
-      setFormData({
-        name: "",
-        email: "",
-        subject: "Commission Request",
-        artwork: "None",
-        message: "",
+    
+    try {
+      const response = await fetch('/api/inquiries.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
       });
-      setSubmitted(false);
-    }, 4000);
+
+      if (response.ok) {
+        setSubmitted(true);
+        // Reset form after a brief delay
+        setTimeout(() => {
+          setFormData({
+            name: "",
+            email: "",
+            subject: "Commission Request",
+            artwork: "None",
+            message: "",
+          });
+          setSubmitted(false);
+        }, 4000);
+      } else {
+        alert('Failed to submit inquiry. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error submitting inquiry:', error);
+      alert('Failed to submit inquiry. Please try again.');
+    }
   };
 
   return (
@@ -192,11 +226,11 @@ function ContactContent() {
                   className="bg-zinc-900/40 border border-zinc-800 focus:border-accent p-3.5 rounded text-xs text-zinc-200 focus:outline-none transition-colors cursor-pointer"
                 >
                   <option value="None" className="bg-zinc-950 text-zinc-200">None / Custom</option>
-                  <option value="Quiet Moments" className="bg-zinc-950 text-zinc-200">Quiet Moments</option>
-                  <option value="Memory of Water" className="bg-zinc-950 text-zinc-200">Memory of Water</option>
-                  <option value="Fields of Gold" className="bg-zinc-950 text-zinc-200">Fields of Gold</option>
-                  <option value="Silent Reverie" className="bg-zinc-950 text-zinc-200">Silent Reverie</option>
-                  <option value="Echoes of Silence" className="bg-zinc-950 text-zinc-200">Echoes of Silence</option>
+                  {paintings.map((painting) => (
+                    <option key={painting.id} value={painting.title} className="bg-zinc-950 text-zinc-200">
+                      {painting.title}
+                    </option>
+                  ))}
                 </select>
               </div>
             </div>
