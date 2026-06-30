@@ -41,6 +41,14 @@ switch ($method) {
         try {
             $stmt = $pdo->query("SELECT * FROM paintings ORDER BY created_at DESC");
             $paintings = $stmt->fetchAll();
+            // Decode additional_images from JSON string to array
+            foreach ($paintings as &$painting) {
+                if (!empty($painting['additional_images'])) {
+                    $painting['additional_images'] = json_decode($painting['additional_images'], true);
+                } else {
+                    $painting['additional_images'] = [];
+                }
+            }
             echo json_encode($paintings);
         } catch (PDOException $e) {
             http_response_code(500);
@@ -61,8 +69,11 @@ switch ($method) {
         }
         
         try {
-            $stmt = $pdo->prepare("INSERT INTO paintings (id, title, medium, dimensions, year, status, price, image, description) 
-                                   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            $stmt = $pdo->prepare("INSERT INTO paintings (id, title, medium, dimensions, year, status, price, image, additional_images, description) 
+                                   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            
+            $additionalImages = isset($data['additional_images']) ? json_encode($data['additional_images']) : '[]';
+            
             $stmt->execute([
                 $data['id'],
                 $data['title'],
@@ -72,6 +83,7 @@ switch ($method) {
                 $data['status'] ?? 'Available',
                 $data['price'],
                 $data['image'],
+                $additionalImages,
                 $data['description'] ?? null
             ]);
             
@@ -105,6 +117,7 @@ switch ($method) {
             if (isset($data['status'])) { $fields[] = "status = ?"; $params[] = $data['status']; }
             if (isset($data['price'])) { $fields[] = "price = ?"; $params[] = $data['price']; }
             if (isset($data['image'])) { $fields[] = "image = ?"; $params[] = $data['image']; }
+            if (isset($data['additional_images'])) { $fields[] = "additional_images = ?"; $params[] = json_encode($data['additional_images']); }
             if (isset($data['description'])) { $fields[] = "description = ?"; $params[] = $data['description']; }
             
             if (empty($fields)) {

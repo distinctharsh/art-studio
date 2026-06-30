@@ -46,10 +46,7 @@ export default function Footer() {
             Studio
           </h4>
           <ul className="flex flex-col gap-2.5 text-sm text-zinc-500">
-            <li className="flex items-center gap-2">
-              <span className="w-1 h-1 rounded-full bg-accent" />
-              Visit by appointment
-            </li>
+
             <li className="flex items-center gap-2">
               <span className="w-1 h-1 rounded-full bg-accent" />
               Worldwide shipping

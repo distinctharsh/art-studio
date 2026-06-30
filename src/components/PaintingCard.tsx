@@ -12,6 +12,7 @@ export interface Painting {
   status: "Available" | "Sold";
   price: string;
   image: string;
+  additional_images?: string[];
 }
 
 interface PaintingCardProps {
@@ -36,12 +37,12 @@ export default function PaintingCard({ painting, onInquire }: PaintingCardProps)
         />
         {/* Status Badge */}
         <span
-          className={`absolute top-4 right-4 px-2.5 py-1 text-[10px] tracking-wider uppercase font-medium rounded-full backdrop-blur-md border ${
-            isAvailable
-              ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
-              : "bg-zinc-500/10 text-zinc-400 border-zinc-500/20"
-          }`}
-        >
+  className={`absolute top-4 left-4 px-2.5 py-1 text-[10px] tracking-wider uppercase font-medium rounded-full shadow-md ${
+    isAvailable
+      ? "bg-emerald-600 text-white"
+      : "bg-gray-700 text-white"
+  }`}
+>
           {painting.status}
         </span>
       </div>

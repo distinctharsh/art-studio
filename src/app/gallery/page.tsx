@@ -14,6 +14,7 @@ function GalleryContent() {
   const searchParams = useSearchParams();
   const [filter, setFilter] = useState<"ALL" | "AVAILABLE" | "SOLD">("ALL");
   const [selectedPainting, setSelectedPainting] = useState<Painting | null>(null);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [inquirySubmitted, setInquirySubmitted] = useState(false);
   const [formData, setFormData] = useState({ name: "", email: "", message: "" });
   const [paintings, setPaintings] = useState<Painting[]>(fallbackPaintings);
@@ -49,6 +50,7 @@ function GalleryContent() {
 
   const closeLightbox = () => {
     setSelectedPainting(null);
+    setCurrentImageIndex(0);
     setInquirySubmitted(false);
     setFormData({ name: "", email: "", message: "" });
     // Remove query param without reload
@@ -57,6 +59,7 @@ function GalleryContent() {
 
   const handleInquireClick = (painting: Painting) => {
     setSelectedPainting(painting);
+    setCurrentImageIndex(0);
     // Add query param
     router.push(`/gallery?id=${painting.id}`, { scroll: false });
   };
@@ -177,14 +180,35 @@ function GalleryContent() {
                 </svg>
               </button>
 
-              {/* Left Side: Artwork Image */}
-              <div className="relative aspect-[3/4] md:aspect-auto w-full h-72 md:h-full bg-zinc-900">
-                <Image
-                  src={selectedPainting.image}
-                  alt={selectedPainting.title}
-                  fill
-                  className="object-cover"
-                />
+              {/* Left Side: Artwork Image(s) */}
+              <div className="relative flex flex-col bg-zinc-900 border-r border-white/[0.05]">
+                <div className="relative aspect-[3/4] md:aspect-auto w-full h-72 md:h-[65%] w-full">
+                  <Image
+                    src={selectedPainting.additional_images && selectedPainting.additional_images.length > 0 
+                      ? [selectedPainting.image, ...selectedPainting.additional_images][currentImageIndex] 
+                      : selectedPainting.image}
+                    alt={selectedPainting.title}
+                    fill
+                    className="object-cover transition-opacity duration-300"
+                  />
+                </div>
+                
+                {/* Thumbnails if additional images exist */}
+                {selectedPainting.additional_images && selectedPainting.additional_images.length > 0 && (
+                  <div className="flex gap-3 overflow-x-auto p-4 md:p-6 bg-black/40 flex-1">
+                    {[selectedPainting.image, ...selectedPainting.additional_images].map((imgUrl, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() => setCurrentImageIndex(idx)}
+                        className={`relative w-20 h-20 md:w-24 md:h-24 flex-shrink-0 border-2 rounded overflow-hidden transition-all duration-300 ${
+                          currentImageIndex === idx ? "border-accent opacity-100" : "border-transparent opacity-50 hover:opacity-100"
+                        }`}
+                      >
+                        <Image src={imgUrl} alt={`${selectedPainting.title} view ${idx + 1}`} fill className="object-cover" />
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
 
               {/* Right Side: Details & Form */}

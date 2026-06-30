@@ -97,13 +97,7 @@ function ContactContent() {
         <div className="w-16 h-[1px] bg-accent/40 my-2" />
 
         <div className="flex flex-col gap-8 text-sm text-zinc-400">
-          <div>
-            <h3 className="text-xs uppercase tracking-widest text-zinc-500 font-semibold mb-2">
-              Studio Location
-            </h3>
-            <p className="font-serif italic">By appointment only</p>
-            <p className="font-serif italic">Colaba, Mumbai, India</p>
-          </div>
+
 
           <div>
             <h3 className="text-xs uppercase tracking-widest text-zinc-500 font-semibold mb-2">
@@ -210,7 +204,7 @@ function ContactContent() {
                 >
                   <option value="Commission Request" className="bg-zinc-950 text-zinc-200">Commission Request</option>
                   <option value="Artwork Purchase" className="bg-zinc-950 text-zinc-200">Artwork Purchase</option>
-                  <option value="Studio Appointment" className="bg-zinc-950 text-zinc-200">Studio Appointment</option>
+
                   <option value="General Inquiry" className="bg-zinc-950 text-zinc-200">General Inquiry</option>
                 </select>
               </div>

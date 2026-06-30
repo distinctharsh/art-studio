@@ -6,8 +6,8 @@ header("Content-Type: application/json");
 // Get request method
 $method = $_SERVER['REQUEST_METHOD'];
 
-// Verify authentication for GET requests (admin only)
-if ($method === 'GET') {
+// Verify authentication for GET and PUT requests (admin only)
+if ($method === 'GET' || $method === 'PUT') {
     $headers = getallheaders();
     $authHeader = isset($headers['Authorization']) ? $headers['Authorization'] : '';
     
@@ -78,6 +78,24 @@ switch ($method) {
         }
         break;
         
+    case 'PUT':
+        $data = json_decode(file_get_contents('php://input'), true);
+        if (!isset($data['id']) || !isset($data['status'])) {
+            http_response_code(400);
+            echo json_encode(["error" => "Missing required fields"]);
+            exit;
+        }
+        
+        try {
+            $stmt = $pdo->prepare("UPDATE inquiries SET status = ? WHERE id = ?");
+            $stmt->execute([$data['status'], $data['id']]);
+            echo json_encode(["message" => "Status updated successfully"]);
+        } catch (PDOException $e) {
+            http_response_code(500);
+            echo json_encode(["error" => "Failed to update status"]);
+        }
+        break;
+
     default:
         http_response_code(405);
         echo json_encode(["error" => "Method not allowed"]);

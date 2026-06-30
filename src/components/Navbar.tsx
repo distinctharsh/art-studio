@@ -2,11 +2,20 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function Navbar() {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    // Check if the user is logged in
+    const token = localStorage.getItem("user_token");
+    if (token) {
+      setIsLoggedIn(true);
+    }
+  }, []);
 
   const navLinks = [
     { name: "HOME", href: "/" },
@@ -45,6 +54,24 @@ export default function Navbar() {
               </Link>
             );
           })}
+          
+          <div className="w-[1px] h-4 bg-zinc-800" />
+
+          {isLoggedIn ? (
+            <Link 
+              href="/profile"
+              className="text-xs tracking-[0.2em] font-sans text-accent hover:text-accent-light transition-colors relative py-2 flex items-center gap-2"
+            >
+              PROFILE
+            </Link>
+          ) : (
+            <Link 
+              href="/login"
+              className="text-xs tracking-[0.2em] font-sans text-zinc-400 hover:text-white transition-colors relative py-2"
+            >
+              LOGIN
+            </Link>
+          )}
         </nav>
 
         {/* Mobile Nav Button */}
@@ -106,6 +133,26 @@ export default function Navbar() {
               </Link>
             );
           })}
+
+          <div className="w-12 h-[1px] bg-zinc-800" />
+          
+          {isLoggedIn ? (
+            <Link
+              href="/profile"
+              onClick={() => setIsOpen(false)}
+              className="text-lg tracking-[0.25em] font-sans transition-colors duration-300 text-accent hover:text-accent-light"
+            >
+              PROFILE
+            </Link>
+          ) : (
+            <Link
+              href="/login"
+              onClick={() => setIsOpen(false)}
+              className="text-lg tracking-[0.25em] font-sans transition-colors duration-300 text-zinc-400 hover:text-white"
+            >
+              LOGIN
+            </Link>
+          )}
         </nav>
       </div>
     </header>

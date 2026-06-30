@@ -52,23 +52,22 @@ export default function Home() {
             <div className="w-full">
               {/* Studio Metadata */}
               <p className="text-xs tracking-[0.3em] text-accent/80 font-medium mb-6 uppercase fade-in">
-                A Studio of One — Mumbai, India
+                A Studio of One — Delhi, India
               </p>
 
               {/* Main Heading */}
               <h1 className="font-serif text-5xl md:text-7xl lg:text-8xl font-light leading-[1.15] text-zinc-100 max-w-4xl tracking-tight fade-in">
-                Paintings that <br />
-                <span className="italic font-normal text-accent/90">remember</span> <br />
-                what we forget.
+                Art beyond words, <br />
+                {/* <span className="italic font-normal text-accent/90">cannot express</span> */}
+                 {/* <br /> */}
+                cannot express.
               </h1>
             </div>
 
             {/* Bottom Panel - Right Side Block */}
             <div className="w-full flex flex-col md:flex-row justify-between items-end gap-10 mt-16 md:mt-24">
               {/* Decorative Line */}
-              <div className="hidden md:block w-32 h-[1px] bg-zinc-800 self-center" />
-              
-              <div className="max-w-md md:text-right flex flex-col md:items-end gap-6">
+              <div className="max-w-md md:text-left flex flex-col md:items-start gap-6">
                 <p className="font-serif text-lg leading-relaxed text-zinc-400 italic font-light">
                   Original works on canvas and paper by Surbhi. <br />
                   Slow, layered, made by hand — each piece is one of one.
@@ -80,6 +79,10 @@ export default function Home() {
                   VIEW THE COLLECTION
                 </Link>
               </div>
+
+              <div className="hidden md:block w-32 h-[1px] bg-zinc-800 self-center" />
+              
+              
             </div>
           </div>
 
